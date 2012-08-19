@@ -5,7 +5,7 @@ libwebp: photographic images.  WebP consists of a codec based on VP8, that
 libwebp: Google open-sourced in May 2010 and a container based on RIFF.
 libwebp: Webmasters, web developers and browser developers can use WebP to
 libwebp: compress, archive and distribute digital images more efficiently.
-libwebp:
-libwebp:
+libwebp: This package includes both the shared library and the coder/decoder
+libwebp: binaries.
 libwebp:
 libwebp: Packaged by Georgi D. Sotirov <gdsotirov@dir.bg>
