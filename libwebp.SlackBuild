@@ -19,13 +19,13 @@
 # 
 # Visit SlackPack at http://sotirov-bg.net/slackpack/
 #
-# $Id: libwebp.SlackBuild,v 1.5 2015/05/30 20:44:52 gsotirov Exp $
+# $Id: libwebp.SlackBuild,v 1.6 2015/05/30 20:49:37 gsotirov Exp $
 #
 
 . ../../slack-package.conf
 
 NAME=libwebp
-VERSION=0.2.1
+VERSION=0.3.1
 ARCH=${ARCH:-i486}
 BUILD=${BUILD:-1}
 
@@ -67,11 +67,14 @@ CPPFLAGS=$SLKCFLAGS \
             --libdir=/usr/lib${LIBDIRSUFFIX} \
             --mandir=/usr/man \
             --enable-shared=yes \
-            --enable-static=no || exit 4
+            --enable-static=no \
+	    --enable-libwebpmux \
+	    --enable-libwebpdemux \
+	    --enable-libwebpdecoder || exit 4
 
 # Build & install
-make -j4 || exit 5
-make DESTDIR=$PKG install || exit 6
+make V=1 -j4 || exit 5
+make V=1 DESTDIR=$PKG install || exit 6
 
 ( cd $PKG; strip_bin; strip_lib )
 DOCFILES="$DOCFILES PATENTS"
@@ -85,8 +88,8 @@ install -m 644 $CWD/slack-required $PKG/install/slack-required
 
 SBDIR=$PKG/usr/src/slackbuilds/$NAME-$VERSION
 install -m 755 -d $SBDIR
-install -m 644 $CWD/slack-desc           $SBDIR/slack-desc
-install -m 644 $CWD/slack-required       $SBDIR/slack-required
+install -m 644 $CWD/slack-desc          $SBDIR/slack-desc
+install -m 644 $CWD/slack-required      $SBDIR/slack-required
 #install -m 644 $CWD/$NAME-$VERSION.diff $SBDIR/$NAME-$VERSION.diff
 install -m 644 $CWD/$NAME.SlackBuild    $SBDIR/$NAME.SlackBuild
 
