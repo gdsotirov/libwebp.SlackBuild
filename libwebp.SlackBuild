@@ -19,7 +19,7 @@
 # 
 # Visit SlackPack at http://sotirov-bg.net/slackpack/
 #
-# $Id: libwebp.SlackBuild,v 1.4 2015/05/30 20:00:08 gsotirov Exp $
+# $Id: libwebp.SlackBuild,v 1.5 2015/05/30 20:44:52 gsotirov Exp $
 #
 
 . ../../slack-package.conf
@@ -64,6 +64,7 @@ CPPFLAGS=$SLKCFLAGS \
 ./configure --host=$ARCH-pc-linux-gnu \
             --build=$ARCH-pc-linux-gnu \
 	    --prefix=/usr \
+            --libdir=/usr/lib${LIBDIRSUFFIX} \
             --mandir=/usr/man \
             --enable-shared=yes \
             --enable-static=no || exit 4
