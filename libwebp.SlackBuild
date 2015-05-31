@@ -19,13 +19,13 @@
 # 
 # Visit SlackPack at http://sotirov-bg.net/slackpack/
 #
-# $Id: libwebp.SlackBuild,v 1.6 2015/05/30 20:49:37 gsotirov Exp $
+# $Id: libwebp.SlackBuild,v 1.7 2015/05/31 17:54:11 gsotirov Exp $
 #
 
 . ../../slack-package.conf
 
 NAME=libwebp
-VERSION=0.3.1
+VERSION=0.4.3
 ARCH=${ARCH:-i486}
 BUILD=${BUILD:-1}
 
