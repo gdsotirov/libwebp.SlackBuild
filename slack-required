@@ -1,8 +1,4 @@
-cxxlibs >= 6.0.14 | gcc-g++ >= 4.5.2
-gcc >= 4.5.2
-glibc-solibs >= 2.13
+glibc-solibs >= 2.11.1
 libjpeg >= v8a
-libpng >= 1.4.12
-libtiff >= 3.9.6
-libvpx >= 1.1.0
-zlib >= 1.2.5
+libpng >= 1.4.19
+zlib >= 1.2.3
