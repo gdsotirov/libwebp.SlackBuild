@@ -1,0 +1,129 @@
+# Patch to use the old handmade makefile as new one from automake doesn't build lib
+# Copyright (C) 2016 Georgi D. Sotirov <gdsotirov@dir.bg>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# Visit SlackPack at http://sotirov-bg.net/slackpack/
+#
+# $Id: libwebp-0.0.5.diff,v 1.1.2.1 2016/08/11 10:43:17 gsotirov Exp $
+#
+diff -urNad webp-orig//libwebp/src/makefile webp/libwebp/src/makefile
+--- webp-orig//libwebp/src/makefile	1970-01-01 02:00:00.000000000 +0200
++++ webp/libwebp/src/makefile	2016-08-11 12:44:37.000000000 +0300
+@@ -0,0 +1,104 @@
++#/*===========================================================================*
++# - Copyright 2010 Google Inc.
++# -
++# - Licensed under the Apache License, Version 2.0 (the "License");
++# - you may not use this file except in compliance with the License.
++# - You may obtain a copy of the License at
++# -
++# -     http://www.apache.org/licenses/LICENSE-2.0
++# -
++# - Unless required by applicable law or agreed to in writing, software
++# - distributed under the License is distributed on an "AS IS" BASIS,
++# - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# - See the License for the specific language governing permissions and
++# - limitations under the License.
++#*===========================================================================*/
++
++# Libraries are built into a binary tree with its root in the
++# parent directory
++ROOT_DIR = ../leptonlib-1.066
++
++LIB_NODEBUG_DIR =	$(ROOT_DIR)/lib/nodebug
++LIB_DEBUG_DIR =		$(ROOT_DIR)/lib/debug
++LIB_SHARED_DIR =	$(ROOT_DIR)/lib/shared
++
++# Include files are found within the same tree
++IMAGELIB_INCL =	$(ROOT_DIR)/src
++
++#CC =		gcc -ansi -Werror -DANSI -fPIC
++CC =            g++ -Werror -fPIC
++
++ifdef  SHARED
++    LIB_DIR =	$(LIB_SHARED_DIR)
++    OPTIMIZE =	-O2
++else
++    ifdef  DEBUG
++	LIB_DIR =	$(LIB_DEBUG_DIR)
++	OPTIMIZE =	-g
++    else
++	LIB_DIR =	$(LIB_NODEBUG_DIR)
++	OPTIMIZE =	-O2
++    endif
++endif
++
++OPTIONS =
++
++INCLUDES =	-I$(IMAGELIB_INCL)
++#INCLUDES =	-I$(IMAGELIB_INCL) -I/usr/X11R6/include -I/usr/local/include $(EXTRAINCLUDES)
++
++CFLAGS =	$(OPTIMIZE) $(OPTIONS)
++
++# Conditional compilation (depending on processor endian-ness)
++# Use -D_STANDARD_C to stub out the non-posix GNU functions fmemopen()
++# and open_memstream()
++CPPFLAGS =      $(INCLUDES)
++
++#LDFLAGS +=	-L$(LIB_DIR) -L/usr/X11R6/lib -L/usr/lib $(EXTRALIBS)
++LDFLAGS +=	-L$(LIB_DIR) -L/usr/X11R6/lib -L/usr/local/lib -L/usr/lib $(EXTRALIBS)
++
++ifdef  SHARED
++    LEPTLIB =		$(LIB_DIR)/liblept.so
++else
++    LEPTLIB =		$(LIB_DIR)/liblept.a
++endif
++
++# To enable gif read/write:
++#    (1) In src/environ.h:  #define  HAVE_LIBGIF
++#    (2) Install giflib-4.1.4, and be sure your LD_LIBRARY_PATH includes
++#        the directory in which libgif.so.4 is installed.
++#    (3) Use the second line below for ALL_LIBS
++ALL_LIBS =	$(LEPTLIB) -ljpeg -lpng -lz -lm
++#ALL_LIBS =	$(LEPTLIB) -ltiff -ljpeg -lpng -lgif -lz -lm
++
++VPX_LIB = -lvpx -lpthread
++
++#########################################################################
++
++SRC =		webpconv.c
++
++######################################################################
++
++all: libwebp.so
++
++
++######################################################################
++
++webpconv: libwebp.o webpconv.o $(LEPTLIB)
++	$(CC) -o webpconv webpconv.o $(ALL_LIBS) libwebp.o $(VPX_LIB)
++
++webpimg.o: webpimg.c
++	$(CC) $(CFLAGS) -o $@ -c $<
++
++libwebp.so: webpimg.o
++	$(CC) -shared -o $@ $< $(VPX_LIB) -Wl,-soname -Wl,$@
++
++install:
++	mkdir -p $(DESTDIR)$(prefix)/include
++	install -m 644 webpimg.h $(DESTDIR)$(prefix)/include/webpimg.h
++	mkdir -p $(DESTDIR)$(prefix)/$(libdir)
++	install -m 755 libwebp.so $(DESTDIR)$(prefix)/$(libdir)/libwebp.so
++
++clean:
++	rm -f webpconv *.o *.so
++
++######################################################################
