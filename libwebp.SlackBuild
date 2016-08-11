@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Slackware build script for LibWebP
-# Copyright (C) 2010 Georgi D. Sotirov <gdsotirov@dir.bg>
+# Copyright (C) 2010-2016 Georgi D. Sotirov <gdsotirov@dir.bg>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,14 +19,14 @@
 # 
 # Visit SlackPack at http://sotirov-bg.net/slackpack/
 #
-# $Id: libwebp.SlackBuild,v 1.1 2010/10/17 09:31:54 gsotirov Exp $
+# $Id: libwebp.SlackBuild,v 1.1.2.1 2016/08/11 11:12:56 gsotirov Exp $
 #
 
-. ../slack-package.conf
+. ../../slack-package.conf
 
 NAME=webp
 PNAME=libwebp
-VERSION=0.0.2
+VERSION=0.0.5
 ARCH=${ARCH:-i486}
 BUILD=${BUILD:-1}
 
@@ -37,7 +37,7 @@ if [ ! -e $TMP ]; then
   mkdir -p $TMP # location to build the source
 fi
 
-SRC=$TMP/$NAME/$PNAME
+SRC=$TMP/$NAME
 if [ -e $SRC -a -d $SRC ]; then
   echo "Source directory '$SRC' already exists! Plaese, move it or remove it."
   exit 1
@@ -52,20 +52,20 @@ mkdir -p $PKG
 
 # Extract the sources
 cd $TMP
-tar -xvf $CWD/$NAME-leptonica-$VERSION.tar.gz || exit 1
+tar -xvf $CWD/$NAME-leptonica-$VERSION.tar.gz || exit 3
 cd $SRC
 fix_source
 
 # Apply patches
-patch -p1 -b -z.orig < $CWD/$PNAME-$VERSION.diff || exit 2
+patch -p1 -b -z.orig < $CWD/$PNAME-$VERSION.diff || exit 4
 
 # Build & install
+cd $SRC/$PNAME/src
 make OPTIONS="$SLKCFLAGS" || exit 3
-make DESTDIR=$PKG prefix=/usr install || exit 4
+make DESTDIR=$PKG prefix=/usr libdir=/lib${LIBDIRSUFFIX} install || exit 4
 
 ( cd $PKG; strip_lib )
-DOCFILES="$DOCFILES PATENTS"
-( cd $SRC; create_docs $PKG $PNAME-$VERSION )
+( cd $SRC/$PNAME; create_docs $PKG $PNAME-$VERSION )
 ( cd $PKG/usr/doc/$PNAME-$VERSION
   mv LICENSE COPYING )
 
