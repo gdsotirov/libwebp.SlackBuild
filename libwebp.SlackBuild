@@ -19,14 +19,14 @@
 # 
 # Visit SlackPack at http://sotirov-bg.net/slackpack/
 #
-# $Id: libwebp.SlackBuild,v 1.9 2016/07/13 19:47:24 gsotirov Exp $
+# $Id: libwebp.SlackBuild,v 1.10 2016/12/21 07:39:42 gsotirov Exp $
 #
 
 . ../../slack-package.conf
 
 NAME=libwebp
-VERSION=0.5.1
-ARCH=${ARCH:-i486}
+VERSION=0.5.2
+ARCH=${ARCH:-i586}
 BUILD=${BUILD:-1}
 
 CWD=${CWD:-`pwd`}
@@ -36,13 +36,13 @@ if [ ! -e $TMP ]; then
   mkdir -p $TMP # location to build the source
 fi
 
-SRC=$TMP/$NAME-$VERSION
+SRC=$TMP/${NAME}-${VERSION}
 if [ -e $SRC -a -d $SRC ]; then
   echo "Source directory '$SRC' already exists! Plaese, move it or remove it."
   exit 1
 fi
 
-PKG=$TMP/package-$NAME
+PKG=$TMP/package-${NAME}
 if [ -e $PKG -a -d $PKG ]; then
   echo "Package creation directory '$PKG' already exists! Please, move it or remove it."
   exit 2
@@ -51,18 +51,20 @@ mkdir -p $PKG
 
 # Extract the sources
 cd $TMP
-tar -xvf $CWD/$NAME-$VERSION.tar.gz || exit 3
+tar -xvf $CWD/${NAME}-${VERSION}.tar.gz || exit 3
 cd $SRC
 fix_source
 
 # Apply patches
-#patch -p1 -b -z.orig < $CWD/$NAME-$VERSION.diff || exit 2
+if [ -e $CWD/${NAME}-${VERSION}.diff ]; then
+  patch -p1 -b -z.orig < $CWD/${NAME}-${VERSION}.diff || exit 4
+fi
 
 # Configure
 CFLAGS=$SLKCFLAGS \
 CPPFLAGS=$SLKCFLAGS \
-./configure --host=$ARCH-pc-linux-gnu \
-            --build=$ARCH-pc-linux-gnu \
+./configure --host=${ARCH}-pc-linux-gnu \
+            --build=${ARCH}-pc-linux-gnu \
 	    --prefix=/usr \
             --libdir=/usr/lib${LIBDIRSUFFIX} \
             --mandir=/usr/man \
@@ -70,15 +72,15 @@ CPPFLAGS=$SLKCFLAGS \
             --enable-static=no \
 	    --enable-libwebpmux \
 	    --enable-libwebpdemux \
-	    --enable-libwebpdecoder || exit 4
+	    --enable-libwebpdecoder || exit 5
 
 # Build & install
-make V=1 -j4 || exit 5
-make V=1 DESTDIR=$PKG install || exit 6
+make V=1 -j4 || exit 6
+make V=1 DESTDIR=$PKG install || exit 7
 
 ( cd $PKG; strip_bin; strip_lib )
 DOCFILES="$DOCFILES PATENTS"
-( cd $SRC; create_docs $PKG $NAME-$VERSION )
+( cd $SRC; create_docs $PKG ${NAME}-${VERSION} )
 gzip_man $PKG
 
 # Copy service info
@@ -86,19 +88,21 @@ install -m 755 -d $PKG/install
 install -m 644 $CWD/slack-desc     $PKG/install/slack-desc
 install -m 644 $CWD/slack-required $PKG/install/slack-required
 
-SBDIR=$PKG/usr/src/slackbuilds/$NAME-$VERSION
+SBDIR=$PKG/usr/src/slackbuilds/${NAME}-${VERSION}
 install -m 755 -d $SBDIR
 install -m 644 $CWD/slack-desc          $SBDIR/slack-desc
 install -m 644 $CWD/slack-required      $SBDIR/slack-required
-#install -m 644 $CWD/$NAME-$VERSION.diff $SBDIR/$NAME-$VERSION.diff
-install -m 644 $CWD/$NAME.SlackBuild    $SBDIR/$NAME.SlackBuild
+if [ -e $CWD/${NAME}-${VERSION}.diff ]; then
+  install -m 644 $CWD/${NAME}-${VERSION}.diff $SBDIR/${NAME}-${VERSION}.diff
+fi
+install -m 644 $CWD/${NAME}.SlackBuild  $SBDIR/${NAME}.SlackBuild
 
-PKGNAME=$NAME-$VERSION-$ARCH-$BUILD$MYIN
+PKGNAME=${NAME}-${VERSION}-${ARCH}-${BUILD}${MYIN}
 cd $PKG
-makepkg -l y -c n $PKG_DIR/$PKGNAME.txz
+makepkg -l y -c n $PKG_DIR/${PKGNAME}.txz
 cd $PKG_DIR
-md5sum $PKGNAME.txz > $PKGNAME.txz.md5
-cp $CWD/slack-desc $PKGNAME.txt
+md5sum ${PKGNAME}.txz > ${PKGNAME}.txz.md5
+cp $CWD/slack-desc ${PKGNAME}.txt
 
 # Clean up (optionally)
 if [ "$1" = "--cleanup" ]; then
