@@ -8,4 +8,4 @@ libwebp: compress, archive and distribute digital images more efficiently.
 libwebp: This package includes both the shared library and the coder/decoder
 libwebp: binaries.
 libwebp:
-libwebp: Packaged by Georgi D. Sotirov <gdsotirov@dir.bg>
+libwebp: Packaged by Georgi D. Sotirov <gdsotirov@gmail.com>
